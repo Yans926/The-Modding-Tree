@@ -1,7 +1,7 @@
 let modInfo = {
-	name: "The Prestige Tree +",
+	name: "The Elemental Tree",
 	author: "nobody",
-	pointsName: "points",
+	pointsName: "mana",
 	modFiles: ["layers.js", "tree.js"],
 	id: "4356718981029920345678976522",
 	
@@ -34,19 +34,24 @@ function getStartPoints(){
 
 // Determines if it should show points/sec
 function canGenPoints() {
-  return hasUpgrade("p", 11);
+	return hasUpgrade("e", 11)
 }
 
 // Calculate points/sec!
 function getPointGen() {
+	if (player.points>1) {
+		return new Decimal(0)}
+	
 	if(!canGenPoints())
 		return new Decimal(0)
 
 	let gain = new Decimal(0.1)
-	if (hasUpgrade('p', 12)) gain = gain.times(2)
-	return gain
+	if (hasUpgrade('e', 12)) gain = gain.times(2)
+	if (hasUpgrade('e', 13)) gain = gain.times(upgradeEffect('e', 13))
 	
-}
+	return gain}
+	
+
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
