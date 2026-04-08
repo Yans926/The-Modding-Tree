@@ -120,23 +120,23 @@ addLayer("w", {
             rows: 1, // # of rows 
             cols: 1, // # of columns 
             11: { 
-                cost(x) { 
-                    return new Decimal(1).mul(2 || getBuyableAmt(this.layer, this.id)) 
-                    },
-                    display() { 
-                        let currentCost = formatWhole(tmp[this.layer].buyables[this.id].cost);
-    
-                        return `Water conduct mana all around. <br>You get more max mana.<br><br>Cost: ${currentCost} points`;
-                    },
-                    canAfford() { 
-                        return player[this.layer].points.gte(this.cost(1)) 
-                    },
-                    buy() {
-                        player[this.layer].points = player[this.layer].points.sub(this.cost())
-                        setBuyableAmount(this.layer, this.id, getBuyableAmt(this.layer, this.id).add(1))
-                    },
-                    
-                }, 
-                // etc... 
-            }
+                cost(x) { x = 1
+                    if (getBuyableAmount(this.layer, this.id)>0)
+                        x = 0
+                    return new Decimal(1).mul(x || getBuyableAmount(this.layer, this.id)) 
+                },
+                display() { 
+                    return "Cost :" + this.cost()
+                },
+                canAfford() { 
+                    return player[this.layer].points.gte(this.cost()) 
+                },
+                buy() {
+                    player[this.layer].points = player[this.layer].points.sub(this.cost())
+                    setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                },
+                unlocked() {return hasUpgrade("w",11)},
+            }, 
+            // etc... 
+        }
     })
