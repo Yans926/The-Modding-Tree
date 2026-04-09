@@ -16,6 +16,7 @@ addLayer("e", {
     gainMult() { // Calculate the multiplier for main currency from bonuses
          let mult = new Decimal(1)
         if (hasUpgrade('e', 14)) mult = mult.times(upgradeEffect('e', 14))
+        if (hasUpgrade('e', 21)) mult = mult.times(upgradeEffect('e',21))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -28,6 +29,8 @@ addLayer("e", {
     layerShown(){return true},
 
         upgrades: {
+            rows: 2, // # of rows 
+            cols: 5,
             11: {
                 title: "First essence",
                 description: "You start feeling the mana around you.",
@@ -77,6 +80,14 @@ addLayer("e", {
                 unlocked() {return hasUpgrade("e", 14);
                     
                 },
+            21: {title: "ELements Harmony",
+                description: "Water essences boost Earth essences gain",
+                cost: new Decimal(20),
+
+                effect() {return player['w'].points.add(1).pow(0,5)},
+                effectDisplay() {return format(upgradeEffect(this.layer, this.id)+"x")},
+                unlocked() {return hasUpgrade('w',12)},
+            },
         },
     }
 })
@@ -114,29 +125,43 @@ addLayer("w", {
                 description: "Unlock a buyable",
                 cost: new Decimal(1),
                 unlocked() {return true;}
+            },
+            12: {title: "This was useful",
+                description: "Water makes the earth more fertile. Unlock new Earth upgrades.",
+                cost: new Decimal (20),
+                unlocked() {return getBuyableAmount(this.layer, 11)>=1}
+
             }
         },
         buyables: { 
             rows: 1, // # of rows 
             cols: 1, // # of columns 
             11: { 
-                cost(x) { x = 1
-                    if (getBuyableAmount(this.layer, this.id)>0)
-                        x = 0
-                    return new Decimal(1).mul(x || getBuyableAmount(this.layer, this.id)) 
+                cost() { 
+                    let amount = getBuyableAmount(this.layer, this.id);
+                    let customCosts = [1, 100, 1000, 10000]
+                    if (amount>=customCosts.length)
+                        return new Decimal(customCosts[customCosts - 1])
+                    return new Decimal (customCosts[amount])
                 },
                 display() { 
-                    return "Cost :" + this.cost()
+                    return "<br><br>You feel mana surrounding you. It seems that you can now sense and use more of it<br>" +"<br><br>Cost :" + this.cost()
+                },
+                title() {
+                    return "Mana expansion"
+                
                 },
                 canAfford() { 
-                    return player[this.layer].points.gte(this.cost()) 
+                    return player.points.gte(this.cost()) 
                 },
                 buy() {
-                    player[this.layer].points = player[this.layer].points.sub(this.cost())
+                    player.points = player.points.sub(this.cost())
                     setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
                 },
                 unlocked() {return hasUpgrade("w",11)},
+                
             }, 
             // etc... 
         }
+
     })

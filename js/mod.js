@@ -39,7 +39,12 @@ function canGenPoints() {
 
 // Calculate points/sec!
 function getPointGen() {
-	if (player.points>1) {
+	let maxMana = 1
+	let maxManaValues = [1, 10]
+	if (getBuyableAmount('w',11)>=1){
+		maxMana = maxManaValues[getBuyableAmount('w',11)]
+	}
+	if (player.points>maxMana) {
 		return new Decimal(0)}
 	
 	if(!canGenPoints())
